@@ -10,9 +10,6 @@ open_file.close()
 # create list to hold the total calories each elf is carrying
 elf_calories = []
 
-# index of current elf we are counting
-elf_index = 0
-
 # holding variable for counting calories
 temp_counter = 0
 
