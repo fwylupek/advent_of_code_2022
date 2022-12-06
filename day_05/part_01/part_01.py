@@ -60,6 +60,7 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
             crate_letter = ''
             # for each vertical position in the stack
             for layer in range(len(stacks_matrix)):
+                # break out of loop of searching for layers if move is complete
                 if is_complete:
                     break
                 # move to next layer if this 'move from' position is empty
@@ -90,6 +91,7 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                         stacks_matrix[layer + 1][from_stack[move]] = ''
                         is_complete = True
 
+# return lowest available position, or -1 if there is no space
 def first_lowest_position(stacks_matrix: list, to_position: int):
     for reversed_layer in reversed(range(len(stacks_matrix))):
         if stacks_matrix[reversed_layer][to_position] == '':
@@ -97,6 +99,7 @@ def first_lowest_position(stacks_matrix: list, to_position: int):
         elif reversed_layer == 0:
             return -1
 
+# print which crate will end up at the top of each stack
 def format_results(stacks_matrix: list):
     output_format = ''
     temp_list = [''] * len(stacks_matrix[0])
