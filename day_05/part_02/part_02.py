@@ -95,13 +95,11 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                         # layer has been added since
                         stacks_matrix[layer + 1][from_stack[move]] = ''
                         is_complete = True
-                    if is_complete:
-                        print(moved_stack)
-                        print(starting_coordinates)
-                        # reorder stack that was moved
-#                        if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
-#                            stacks_matrix.pop(0)
-#                        reorder_multi_stack(stacks_matrix, how_many[move], to_stack[move])
+        if is_complete:
+            # reorder stack that was moved
+            if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
+                stacks_matrix.pop(0)
+            reorder_multi_stack(stacks_matrix, how_many[move], moved_stack, starting_coordinates)
 
 # return lowest available position, or -1 if there is no space
 def first_lowest_position(stacks_matrix: list, to_position: int):
@@ -110,14 +108,6 @@ def first_lowest_position(stacks_matrix: list, to_position: int):
             return reversed_layer
         elif reversed_layer == 0:
             return -1
-
-# return highest non-empty position
-def first_highest_position(stacks_matrix: list, to_position: int):
-    for layer in range(len(stacks_matrix)):
-        if stacks_matrix[layer][to_position] != '':
-            return layer
-    return 0
-
 
 # print which crate will end up at the top of each stack
 def format_results(stacks_matrix: list):
@@ -131,17 +121,20 @@ def format_results(stacks_matrix: list):
         output_format += crate
     print(output_format)
 
-def reorder_multi_stack(stacks_matrix: list, moves: int, to_position: int):
-    if moves == 1:
+def reorder_multi_stack(stacks_matrix: list, moves: int, \
+    moved_stack: list, starting_coordinates: list):
+    print(len(moved_stack))
+    print(moved_stack)
+    print(starting_coordinates)
+    if starting_coordinates[0] == -1:
+        starting_coordinates = 0
+    print(stacks_matrix[1][2])
+    # coordinates are in row, column format
+    if len(moved_stack) <= 0:
         return
-    # get list of stack that was placed
-    new_stack = []
-    highest_position = first_highest_position(stacks_matrix, to_position)
-    if highest_position < 0:
-        return
-    for num in range(moves):
-        new_stack.append(stacks_matrix[highest_position + num][to_position])
-    print(new_stack)
+    moved_stack.reverse()
+    for num in range(len(moved_stack)):
+        stacks_matrix[starting_coordinates[0 + num]][starting_coordinates[1]] = moved_stack[num]
 
 def main():
     stacks_matrix = []
