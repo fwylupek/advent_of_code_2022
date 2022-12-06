@@ -55,9 +55,11 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
         starting_coordinates = [0, 0]
         # for number of crates to move
         for count in range(how_many[move]):
-            print(stacks_matrix)
             print()
-            print('move ' + str(move) + ', part ' + str(count + 1) + ' of ' + str(how_many[move]))
+            print('begin')
+            for line in stacks_matrix:
+                print(line)
+            print('move ' + str(move + 1) + ', part ' + str(count + 1) + ' of ' + str(how_many[move]))
             # remove top layer from matrix if empty
             if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
                 stacks_matrix.pop(0)
@@ -67,6 +69,10 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
             for layer in range(len(stacks_matrix)):
                 # break out of loop of searching for layers if move is complete
                 if is_complete:
+                    for line in stacks_matrix:
+                        print(line)
+                    print('end')
+                    print()
                     break
                 # move to next layer if this 'move from' position is empty
                 if stacks_matrix[layer][from_stack[move]] != '':
@@ -83,20 +89,32 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                         starting_coordinates[0] = lowest_position
                     else:
                         starting_coordinates[0] = 0
+                    print('lowest space available found: ' + str(lowest_position))
                     # if there exists a space for the crate, move it there
                     if lowest_position > -1:
+                        print('assigning: ' + stacks_matrix[lowest_position][to_stack[move]])
+                        print('to: ' + crate_letter)
+                        print('location: ' + str(to_stack[move]))
                         stacks_matrix[lowest_position][to_stack[move]] = \
                             crate_letter
+                        print('removing: ' + stacks_matrix[layer][from_stack[move]])
+                        print('location: ' + str(from_stack[move]))
                         stacks_matrix[layer][from_stack[move]] = ''
                         is_complete = True
                     # if there is no space in this position
                     else:
                         # make a new layer
+                        print('inserting new layer')
                         stacks_matrix.insert(0, \
                             [''] * len(stacks_matrix[layer]))
+                        print('assigning: ' + stacks_matrix[0][to_stack[move]])
+                        print('to: ' + crate_letter)
+                        print('location: ' + str(to_stack[move]))
                         # add crate to desired position in new layer
                         stacks_matrix[0][to_stack[move]] = \
                             crate_letter
+                        print('removing: ' + stacks_matrix[layer + 1][from_stack[move]])
+                        print('location: ' + str(from_stack[move]))
                         # remove crate from old layer, plus 1 because a new
                         # layer has been added since
                         stacks_matrix[layer + 1][from_stack[move]] = ''
@@ -135,22 +153,33 @@ def reorder_multi_stack(stacks_matrix: list, moved_stack: list, \
     if starting_coordinates[0] == -1:
         starting_coordinates = 0
     # coordinates are in row, column format
-    if len(moved_stack) <= 0:
+    if len(moved_stack) <= 1:
+        print('moved stack too small for reordering')
         return
+    print('reordering stack: ')
+    print(moved_stack)
     moved_stack.reverse()
+    print(moved_stack)
     if starting_coordinates[0] == 0:
         for num in range(len(moved_stack)):
+            print(stacks_matrix[len(moved_stack) - num][starting_coordinates[1]])
+            print('to ' + moved_stack[num])
             stacks_matrix[len(moved_stack) - num][starting_coordinates[1]] = moved_stack[num]
         return
 
     for num in range(len(moved_stack)):
+        print(stacks_matrix[len(moved_stack) - num][starting_coordinates[1]])
+        print('to ' + moved_stack[num])
         stacks_matrix[starting_coordinates[0] - num][starting_coordinates[1]] = moved_stack[num]
 
 def main():
+    for num in range(10):
+        print()
     stacks_matrix = []
     moves_list = []
     load_input(stacks_matrix, moves_list)
     rearrange_crates(stacks_matrix, moves_list)
+    print('\nresults:')
     for layer in stacks_matrix:
         print(layer)
     format_results(stacks_matrix)
