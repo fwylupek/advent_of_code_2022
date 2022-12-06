@@ -69,11 +69,14 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                 if stacks_matrix[layer][from_stack[move]] != '':
                     # letter of crate being moved is first occupied
                     # vertical space
+                    moved_stack.append(crate_letter)
+                    starting_coordinates[1] = to_stack[move]
                     crate_letter = stacks_matrix[layer][from_stack[move]]
                     # lowest vertical position this crate can be moved to
                     # as per the 'move to' part of the command
                     lowest_position = \
                         first_lowest_position(stacks_matrix, to_stack[move])
+                    starting_coordinates[0] = lowest_position
                     # if there exists a space for the crate, move it there
                     if lowest_position > -1:
                         stacks_matrix[lowest_position][to_stack[move]] = \
@@ -93,10 +96,12 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                         stacks_matrix[layer + 1][from_stack[move]] = ''
                         is_complete = True
                     if is_complete:
+                        print(moved_stack)
+                        print(starting_coordinates)
                         # reorder stack that was moved
-                        if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
-                            stacks_matrix.pop(0)
-                        reorder_multi_stack(stacks_matrix, how_many[move], to_stack[move])
+#                        if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
+#                            stacks_matrix.pop(0)
+#                        reorder_multi_stack(stacks_matrix, how_many[move], to_stack[move])
 
 # return lowest available position, or -1 if there is no space
 def first_lowest_position(stacks_matrix: list, to_position: int):
