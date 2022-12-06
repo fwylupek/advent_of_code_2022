@@ -55,6 +55,9 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
         starting_coordinates = [0, 0]
         # for number of crates to move
         for count in range(how_many[move]):
+            print(stacks_matrix)
+            print()
+            print('move ' + str(move) + ', part ' + str(count + 1) + ' of ' + str(how_many[move]))
             # remove top layer from matrix if empty
             if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
                 stacks_matrix.pop(0)
@@ -76,7 +79,10 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                     # as per the 'move to' part of the command
                     lowest_position = \
                         first_lowest_position(stacks_matrix, to_stack[move])
-                    starting_coordinates[0] = lowest_position
+                    if lowest_position > 0:
+                        starting_coordinates[0] = lowest_position
+                    else:
+                        starting_coordinates[0] = 0
                     # if there exists a space for the crate, move it there
                     if lowest_position > -1:
                         stacks_matrix[lowest_position][to_stack[move]] = \
@@ -99,7 +105,8 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
             # reorder stack that was moved
             if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
                 stacks_matrix.pop(0)
-            reorder_multi_stack(stacks_matrix, how_many[move], moved_stack, starting_coordinates)
+            reorder_multi_stack(stacks_matrix, moved_stack, \
+                starting_coordinates)
 
 # return lowest available position, or -1 if there is no space
 def first_lowest_position(stacks_matrix: list, to_position: int):
@@ -121,20 +128,23 @@ def format_results(stacks_matrix: list):
         output_format += crate
     print(output_format)
 
-def reorder_multi_stack(stacks_matrix: list, moves: int, \
-    moved_stack: list, starting_coordinates: list):
-    print(len(moved_stack))
-    print(moved_stack)
+def reorder_multi_stack(stacks_matrix: list, moved_stack: list, \
+    starting_coordinates: list):
+    print('coords: ')
     print(starting_coordinates)
     if starting_coordinates[0] == -1:
         starting_coordinates = 0
-    print(stacks_matrix[1][2])
     # coordinates are in row, column format
     if len(moved_stack) <= 0:
         return
     moved_stack.reverse()
+    if starting_coordinates[0] == 0:
+        for num in range(len(moved_stack)):
+            stacks_matrix[len(moved_stack) - num][starting_coordinates[1]] = moved_stack[num]
+        return
+
     for num in range(len(moved_stack)):
-        stacks_matrix[starting_coordinates[0 + num]][starting_coordinates[1]] = moved_stack[num]
+        stacks_matrix[starting_coordinates[0] - num][starting_coordinates[1]] = moved_stack[num]
 
 def main():
     stacks_matrix = []
