@@ -51,6 +51,8 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
     
     # for each move
     for move in range(len(moves_list)):
+        moved_stack = []
+        starting_coordinates = [0, 0]
         # for number of crates to move
         for count in range(how_many[move]):
             # remove top layer from matrix if empty
@@ -94,8 +96,6 @@ def rearrange_crates(stacks_matrix: list, moves_list: list):
                         # reorder stack that was moved
                         if stacks_matrix[0] == [''] * len(stacks_matrix[0]):
                             stacks_matrix.pop(0)
-                        print(how_many[move])
-                        print(to_stack[move])
                         reorder_multi_stack(stacks_matrix, how_many[move], to_stack[move])
 
 # return lowest available position, or -1 if there is no space
