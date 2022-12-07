@@ -11,13 +11,14 @@ def process_input(input_list: list, data_list: list, working_directory : str):
             print('command: ' + input_list[line][2:])
             if input_list[line][2:] == 'ls':
                 print('listing directory')
-                list_directory(working_directory, input_list, line)
+                load_data(working_directory, list_directory(input_list, line), data_list)
             if input_list[line][2:4] == 'cd':
                 print('changing directory')
                 working_directory = \
                     change_directory(input_list[line], working_directory)
                 print('current working directory:')
                 print(working_directory)
+            print()
     return
 
 # accept 'cd' command and working directory, and return new working directory
@@ -41,8 +42,8 @@ def change_directory(command: str, working_directory: str):
         print('appending to directory')
         return working_directory + command[5:] + '/'
 
-def list_directory(working_directory: str, input_list: list, \
-    output_position: int):
+# returns slice of input that is current output of 'ls' command
+def list_directory(input_list: list, output_position: int):
     # todo: append working directory + 'dir' type to new DeviceData
     # process slice of lines between output_position and next '$'
     # output_position += length of ls output
@@ -58,22 +59,44 @@ def list_directory(working_directory: str, input_list: list, \
     print('directory listing:')
     print(input_list[start_position:end_position])
     output_position = end_position
+    return input_list[start_position:end_position]
+
+# set each element of directory listing to a DeviceData object
+def load_data(working_directory: str, directory_listing: list, data_list: list):
+    for item in range(len(directory_listing)):
+        data_list.append(DeviceData())
+
+        data_list[-1].location = \
+            working_directory + directory_listing[item].split(' ')[1]
+
+        if directory_listing[item].split(' ')[0] == 'dir':
+            data_list[-1].type = 'directory'
+        else:
+            data_list[-1].type = 'file'
+            data_list[-1].size = directory_listing[item].split(' ')[0]
+
+        data_list[-1].name = data_list[-1].location.split('/')[-1]
+
 
 class DeviceData:
     location = '/'
     type = 'file or directory'
     size = 0
-    name = location.split('/')[-1]
+    name = ''
 
 def main():
     working_directory = ''
     input_list = []
-    # dynamically create list of DeviceData objects
     data_list = []
-    for num in range(10):
-        data_list.append(DeviceData())
-        data_list[num].location += str(num)
+
     load_input('example_input.txt', input_list)
     process_input(input_list, data_list, working_directory)
+
+    for data in data_list:
+        print(data.location)
+        print(data.type)
+        print(data.size)
+        print(data.name)
+        print()
 
 main()
