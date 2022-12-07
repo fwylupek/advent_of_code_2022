@@ -27,17 +27,17 @@ def load_data(input_list: list, data_list: list):
     #   add files and directories between the ls and next dollar sign
     return
 
+# accept 'cd' command and working directory, and return new working directory
 def change_directory(command: str, working_directory: str):
-    # real function will account for '$ ' before 'cd x'
     # move to root
-    if len(command) == 4 and command[3] == '/':
+    if len(command) == 6 and command[5] == '/':
         print('moving to \'/\'')
         return '/'
     # move to absolute path from '/'
-    if command[3] == '/':
-        print('moving to: ' + command[3:])
+    if command[5] == '/':
+        print('moving to: ' + command[5:])
         return command[3:] + '/'
-    elif command[3:] == '..':
+    elif command[5:] == '..':
         print('moving up one directory')
         temp_directory = ''
         for num in range(len(working_directory.split('/')) - 2):
@@ -46,7 +46,7 @@ def change_directory(command: str, working_directory: str):
         return temp_directory
     else:
         print('appending to directory')
-        return working_directory + command[3:] + '/'
+        return working_directory + command[5:] + '/'
 
 class DeviceData:
     location = '/'
@@ -55,8 +55,8 @@ class DeviceData:
     name = location.split('/')[-1]
 
 def main():
-    directory_commands = ['cd /', 'cd a', 'cd b', 'cd c', 'cd ..', \
-                'cd b1', 'cd ..', 'cd /a', 'cd /']
+    directory_commands = ['$ cd /', '$ cd a', '$ cd b', '$ cd c', '$ cd ..', \
+        '$ cd b1', '$ cd ..', '$ cd /a', '$ cd /']
     # dynamically create list of DeviceData objects
     data_list = []
     for num in range(10):
