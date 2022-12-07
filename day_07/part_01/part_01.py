@@ -1,30 +1,23 @@
-file_tree = \
-    ['/', 
-        ['a',
-            ['e',
-                ['i', 584]]],
-        ['b.txt', 14848514],
-        ['c.dat', 8504156],
-        ['d',
-            ['j', 4060174],
-            ['d.log', 8033020],
-            ['d.ext', 5626152],
-            ['k', 7214296]]
-    ]
-
 def load_input(input_file: str, input_list: list):
     open_file = open(input_file)
     for line in open_file:
-        input_list.append(line)
+        input_list.append(line.strip())
     open_file.close()
 
-def load_data(input_list: list, data_list: list):
-    # go through each line
-    # hold variable for working_directory
-    # if 'ls', 
-    #   hold that position
-    #   look for the next dollar sign
-    #   add files and directories between the ls and next dollar sign
+def process_input(input_list: list, data_list: list, working_directory : str):
+    for line in range(len(input_list)):
+        # if the line is a command
+        if '$' in input_list[line]:
+            print('command: ' + input_list[line][2:])
+            if input_list[line][2:] == 'ls':
+                print('listing directory')
+                list_directory(working_directory, input_list, line)
+            if input_list[line][2:4] == 'cd':
+                print('changing directory')
+                working_directory = \
+                    change_directory(input_list[line], working_directory)
+                print('current working directory:')
+                print(working_directory)
     return
 
 # accept 'cd' command and working directory, and return new working directory
@@ -48,6 +41,24 @@ def change_directory(command: str, working_directory: str):
         print('appending to directory')
         return working_directory + command[5:] + '/'
 
+def list_directory(working_directory: str, input_list: list, \
+    output_position: int):
+    # todo: append working directory + 'dir' type to new DeviceData
+    # process slice of lines between output_position and next '$'
+    # output_position += length of ls output
+    start_position = output_position + 1
+    end_position = start_position
+    for line_position in range(len(input_list[start_position:])):
+        if '$' in input_list[line_position + start_position]:
+            end_position = line_position + start_position
+            break
+    # otherwise, we are at the end of the input
+    if end_position == start_position:
+        end_position = len(input_list)
+    print('directory listing:')
+    print(input_list[start_position:end_position])
+    output_position = end_position
+
 class DeviceData:
     location = '/'
     type = 'file or directory'
@@ -55,20 +66,14 @@ class DeviceData:
     name = location.split('/')[-1]
 
 def main():
-    directory_commands = ['$ cd /', '$ cd a', '$ cd b', '$ cd c', '$ cd ..', \
-        '$ cd b1', '$ cd ..', '$ cd /a', '$ cd /']
+    working_directory = ''
+    input_list = []
     # dynamically create list of DeviceData objects
     data_list = []
     for num in range(10):
         data_list.append(DeviceData())
         data_list[num].location += str(num)
-    
-    # testing change_directory function
-    working_directory = ''
-    for command in directory_commands:
-        print('command: ' + command)
-        working_directory = change_directory(command, working_directory)
-        print('cwd: ' + working_directory)
-        print()
+    load_input('example_input.txt', input_list)
+    process_input(input_list, data_list, working_directory)
 
 main()
