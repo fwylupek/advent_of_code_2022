@@ -1,3 +1,5 @@
+MAX_SIZE = 100000
+
 def load_input(input_file: str, input_list: list):
     open_file = open(input_file)
     for line in open_file:
@@ -71,12 +73,35 @@ def load_data(working_directory: str, directory_listing: list, data_list: list):
 
         if directory_listing[item].split(' ')[0] == 'dir':
             data_list[-1].type = 'directory'
+            data_list[-1].location = data_list[-1].location + '/'
         else:
             data_list[-1].type = 'file'
-            data_list[-1].size = directory_listing[item].split(' ')[0]
+            data_list[-1].size = int(directory_listing[item].split(' ')[0])
 
         data_list[-1].name = data_list[-1].location.split('/')[-1]
 
+# for every directory, add up the files inside, traversing directories
+# and adding them as well
+def get_deletion_candidate(data_list: list):
+    # option 1:
+        # first, set the directory size values to the files they contain
+        # then, set the directory size values to the directories they contain
+    # option 2:
+    # it's a little broken right now, but I have to come back to this
+    for f in range(len(data_list)):
+        for d in range(len(data_list)):
+            if f != d and \
+                data_list[f].type == 'file' and \
+                data_list[d].type == 'directory':
+                print('comparing ', \
+                    data_list[f].location, data_list[d].location)
+                if data_list[f].location in data_list[d].location:
+                    data_list[d].size += data_list[f].size
+                    print(int(data_list[d].size + data_list[f].size))
+
+    for data in data_list:
+        if data.type == 'directory':
+            print('directory ' + data.location + ': ' + str(data.size))
 
 class DeviceData:
     location = '/'
@@ -91,12 +116,16 @@ def main():
 
     load_input('example_input.txt', input_list)
     process_input(input_list, data_list, working_directory)
-
-    for data in data_list:
-        print(data.location)
-        print(data.type)
-        print(data.size)
-        print(data.name)
+    
+    # check data_list
+    for i in data_list:
         print()
+        print('location:', i.location)
+        print('type', i.type)
+        print('size:', i.size)
+        print()
+
+    get_deletion_candidate(data_list)
+
 
 main()
