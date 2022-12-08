@@ -7,6 +7,12 @@ def load_input(input_file: str, input_list: list):
     open_file.close()
 
 def process_input(input_list: list, data_list: list, working_directory : str):
+    # add '/' directory first
+    data_list.append(DeviceData())
+    data_list[0].type = 'directory'
+    data_list[0].location = '/'
+    data_list[0].name = '/'
+
     for line in range(len(input_list)):
         # if the line is a command
         if '$' in input_list[line]:
@@ -68,10 +74,10 @@ def load_data(working_directory: str, directory_listing: list, data_list: list):
     for item in range(len(directory_listing)):
         data_list.append(DeviceData())
 
-
         if directory_listing[item].split(' ')[0] == 'dir':
             data_list[-1].type = 'directory'
-            data_list[-1].location = working_directory + directory_listing[item].split(' ')[1] + '/'
+            data_list[-1].location = \
+                working_directory + directory_listing[item].split(' ')[1] + '/'
         else:
             data_list[-1].type = 'file'
             data_list[-1].size = int(directory_listing[item].split(' ')[0])
@@ -81,31 +87,70 @@ def load_data(working_directory: str, directory_listing: list, data_list: list):
 
 # for every directory, add up the files inside, traversing directories
 # and adding them as well
-def get_folder_sizes(data_list: list):
-    # add sizes of all files to each parent directory
-    for f in range(len(data_list)):
-        for d in range(len(data_list)):
-            if f != d and \
-                data_list[f].type == 'file' and data_list[d].type == 'directory':
-                if data_list[d].location == data_list[f].location:
-                    data_list[d].size += data_list[f].size
+def get_directory_sizes(data_list: list):
+    # add up files to directory sizes
+    files = []
+    directories = []
+    for data in data_list:
+        if data.type == 'file':
+            files.append(data)
+        else:
+            directories.append(data)
+    
+    for file in files:
+        for directory in directories:
+            if file.location == directory.location:
+                directory.size += file.size
+    
+    # doesn't work because not ordered
+#    for i in directories:
+#        for j in directories:
+#            # add to parent directory
+#            # if one directory is equal to the other, minus one level
+#            if i.location in j.location and \
+#                len(i.location.split('/')) + 1 == len(j.location.split('/')):
+#                if i.name != j.name:
+#                    print('adding', j.location, 'to', i.location)
+#                    i.size += j.size
+    # doesn't work because additions repeat
+#    for f in data_list:
+#        for d in data_list:
+#            if f != d:
+#                if f.type == 'file' and d.type == 'directory':
+#                    if f.location == d.location:
+#                        d.size += f.size
+#
+#    # add up directories to directory sizes
+#    for i in data_list:
+#        for j in data_list:
+#            # if one location is contained within another location,
+#            # but names are not the same (they aren't the same directory)
+#            if i.location in j.location:
+#                if i.name != j.name:
+#                    j.size += i.size
+    # add each directory to a list[][], sort it, start from bottom
+    # adding file sizes to directories can be done in any order,
+    # but the order of adding directories to directories has to be done
+    # starting with the most nested directories first
+    dir_list = []
+    for dir in directories:
+        dir_list.append([dir.location, dir.size])
+    print(dir_list)
 
     for data in data_list:
         if data.type == 'directory':
-            print('directory ' + data.location + ': ' + str(data.size))
-    # then add each directory to parent directory, starting with most
-    # nested, i.e. /foo/bar before /foo, and add each to sum if over MAX_SIZE
-    # todo
+            print(data.location, data.size)
 
 def get_results_total(data_list: list):
     sum = 0
     for data in data_list:
         if data.type == 'directory':
-            if data.size >= MAX_SIZE:
+            if data.size <= MAX_SIZE:
                 sum += data.size
     return sum
     # 211047775 is too high
     # 46762389 is too high
+    # 1142162 is also wrong...
 
 class DeviceData:
     location = '/'
@@ -130,7 +175,7 @@ def main():
         print('name:', i.name)
         print()
 
-    get_folder_sizes(data_list)
+    get_directory_sizes(data_list)
     print('sum:', get_results_total(data_list))
 
 main()
