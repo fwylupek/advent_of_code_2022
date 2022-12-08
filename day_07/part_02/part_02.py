@@ -81,6 +81,12 @@ def list_directory(input_list: list, output_position: int):
     output_position = end_position
     return input_list[start_position:end_position]
 
+def calculate_directory_depth(input: list):
+    directory_depths = []
+    for i in range(0, len(input)):
+        directory_depths.append('/'.join(input[: i + 1]))
+    return directory_depths
+
 # set each element of directory listing to a DeviceData object
 def load_data(working_directory: str, directory_listing: list, data_list: list):
     # for each directory listing, create new DeviceData object
@@ -104,64 +110,40 @@ def load_data(working_directory: str, directory_listing: list, data_list: list):
 
 # for every directory, add up the files inside, traversing directories
 # and adding them as well
-def get_directory_sizes(data_list: list):
-    # add up files to directory sizes, start with new lists for each type to
-    # avoid repeating additions
-    files = []
-    directories = []
-    for data in data_list:
-        if data.type == 'file':
-            files.append(data)
-        else:
-            directories.append(data)
-    
-    for file in files:
-        for directory in directories:
-            # the file exists in the directory, add the size to the directory
-            if file.location == directory.location:
-                directory.size += file.size
-
-    # add each directory to a list[][], sort it, start from bottom
-    # adding file sizes to directories can be done in any order,
-    # but the order of adding directories to directories has to be done
-    # starting with the most nested directories first
-    directory_sizes = []
-    for i in directories:
-        directory_sizes.append([i.location, i.size])
-    # sort directories by most nested, having most parents, first
-    directory_sizes.sort(key=lambda x: len(x[0].split('/')), reverse=True)
-
-    for i in directory_sizes:
-        for j in directory_sizes:
-            # if one directory is nested within another and difference in
-            # number of nested directories is no more than one, one directory
-            # is the parent of another, so add the size of the nested
-            # directory to the parent
-            if i[0] in j[0] and \
-                len(i[0].split('/')) + 1 == len(j[0].split('/')):
-                if i[1] != j[1]:
-                    i[1] += j[1]
-
-    return directory_sizes
+def get_directory_sizes():
+    directories = {}
+    working_directory = []
+    with open('input.txt', 'r') as input_file:
+        for line in input_file.readlines():
+            command = line.strip().split(' ')
+            if '$ cd /' in line:
+                working_directory = ['/']
+            if '$ cd ..' in line:
+                working_directory.pop()
+            elif '$ cd ' in line:
+                working_directory.append(command[2])
+            # if file size is listed (not a directory)
+            elif command[0].isdigit():
+                for val in calculate_directory_depth(working_directory):
+                    directories[val] = directories.get(val, 0) + int(command[0])
+    return directories
 
 # find smallest single file to delete that would free up space equal to
 # GOAL_SIZE
 def get_smallest_deletion(directory_sizes: list):
-    # total amount of used space is equal to '/', last directory in list
-    used_space = directory_sizes[-1][1]
-    # amount needed is equal to DISK_SIZE - used space
-    unused_space = DISK_SIZE - used_space
-    # required space is remainder of unused space to meet GOAL_SIZE
+    # root directory is total used space
+    unused_space = DISK_SIZE - directory_sizes['/']
     required_space = GOAL_SIZE - unused_space
-
-    deletion_candidates = []
-    for directory in directory_sizes:
-        if directory[1] >= required_space:
-            deletion_candidates.append(directory)
-    
-    print('candidates:', deletion_candidates)
-
-    return '\ndisk size: ' + str(DISK_SIZE) + '\nused space: ' + str(used_space) + '\nunused space: ' + str(unused_space) + '\nrequired: ' + str(required_space)
+    sorted_input = []
+    # for each file size in directory dictionary
+    for directory in directory_sizes.values():
+        # if deleting would free up enough space
+        if directory >= required_space:
+            sorted_input.append(directory)
+    # sort ascending
+    sorted_input.sort()
+    # return the smallest
+    return sorted_input[0]
 
 class DeviceData:
     location = '/'
@@ -187,7 +169,7 @@ def main():
         print('name:', i.name)
         print()
 
-    directory_sizes = get_directory_sizes(data_list)
+    directory_sizes = get_directory_sizes()
     print('size of directory to delete:', \
         get_smallest_deletion(directory_sizes))
 
