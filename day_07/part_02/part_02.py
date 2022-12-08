@@ -153,7 +153,15 @@ def get_smallest_deletion(directory_sizes: list):
     unused_space = DISK_SIZE - used_space
     # required space is remainder of unused space to meet GOAL_SIZE
     required_space = GOAL_SIZE - unused_space
-    return '\nused space: ' + str(used_space) + '\nunused space: ' + str(unused_space) + '\nrequired: ' + str(required_space)
+
+    deletion_candidates = []
+    for directory in directory_sizes:
+        if directory[1] >= required_space:
+            deletion_candidates.append(directory)
+    
+    print('candidates:', deletion_candidates)
+
+    return '\ndisk size: ' + str(DISK_SIZE) + '\nused space: ' + str(used_space) + '\nunused space: ' + str(unused_space) + '\nrequired: ' + str(required_space)
 
 class DeviceData:
     location = '/'
