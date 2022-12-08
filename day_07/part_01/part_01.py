@@ -68,40 +68,44 @@ def load_data(working_directory: str, directory_listing: list, data_list: list):
     for item in range(len(directory_listing)):
         data_list.append(DeviceData())
 
-        data_list[-1].location = \
-            working_directory + directory_listing[item].split(' ')[1]
 
         if directory_listing[item].split(' ')[0] == 'dir':
             data_list[-1].type = 'directory'
-            data_list[-1].location = data_list[-1].location + '/'
+            data_list[-1].location = working_directory + directory_listing[item].split(' ')[1] + '/'
         else:
             data_list[-1].type = 'file'
             data_list[-1].size = int(directory_listing[item].split(' ')[0])
+            data_list[-1].location = working_directory
 
-        data_list[-1].name = data_list[-1].location.split('/')[-1]
+        data_list[-1].name = directory_listing[item].split(' ')[1]
 
 # for every directory, add up the files inside, traversing directories
 # and adding them as well
-def get_deletion_candidate(data_list: list):
-    # option 1:
-        # first, set the directory size values to the files they contain
-        # then, set the directory size values to the directories they contain
-    # option 2:
-    # it's a little broken right now, but I have to come back to this
+def get_folder_sizes(data_list: list):
+    # add sizes of all files to each parent directory
     for f in range(len(data_list)):
         for d in range(len(data_list)):
             if f != d and \
-                data_list[f].type == 'file' and \
-                data_list[d].type == 'directory':
-                print('comparing ', \
-                    data_list[f].location, data_list[d].location)
-                if data_list[f].location in data_list[d].location:
+                data_list[f].type == 'file' and data_list[d].type == 'directory':
+                if data_list[d].location == data_list[f].location:
                     data_list[d].size += data_list[f].size
-                    print(int(data_list[d].size + data_list[f].size))
 
     for data in data_list:
         if data.type == 'directory':
             print('directory ' + data.location + ': ' + str(data.size))
+    # then add each directory to parent directory, starting with most
+    # nested, i.e. /foo/bar before /foo, and add each to sum if over MAX_SIZE
+    # todo
+
+def get_results_total(data_list: list):
+    sum = 0
+    for data in data_list:
+        if data.type == 'directory':
+            if data.size >= MAX_SIZE:
+                sum += data.size
+    return sum
+    # 211047775 is too high
+    # 46762389 is too high
 
 class DeviceData:
     location = '/'
@@ -123,9 +127,10 @@ def main():
         print('location:', i.location)
         print('type', i.type)
         print('size:', i.size)
+        print('name:', i.name)
         print()
 
-    get_deletion_candidate(data_list)
-
+    get_folder_sizes(data_list)
+    print('sum:', get_results_total(data_list))
 
 main()
