@@ -44,6 +44,23 @@ def get_head_positions(input_list: list):
     
     return head_positions
 
+def get_tail_positions(head_positions: list):
+    tail_positions = []
+
+    # start at 0, 0
+    tail_positions.append([0, 0])
+
+    # if "touching" or in the same position of the head, don't move
+    # I think that means if x and y or no more than 1 position away
+
+    # if moving only horizontally or vertically, from the same direction,
+    # just take the same number of steps, - 1
+
+    # if moving vertically from horizontally, or horizontally from vertically,
+    # cut off the "corner"
+
+    return tail_positions
+
 def get_grid_size(head_positions: list):
     width = 0
     height = 0
