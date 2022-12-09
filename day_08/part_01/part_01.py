@@ -34,43 +34,44 @@ def get_visibility(x: int, y: int, tree_heights: list):
     # get visibility in the right direction
     return False
 
-def check_up(x: int, y: int, tree_heights: list):
+def check_up(row: int, column: int, tree_heights: list):
     # get visibility in the up direction
     for up_direction in range(len(tree_heights)):
-        print('comparing', tree_heights[x][up_direction], 'to', tree_heights[x][y])
-        if tree_heights[x][up_direction] >= tree_heights[x][y]:
-            if up_direction == y:
+        if tree_heights[up_direction][row] >= tree_heights[column][row]:
+            if up_direction == column:
                 print('tree is visible from up direction')
                 return True
             print('tree is not visible from up direction')
             break
 
-def check_down(x:int, y: int, tree_heights: list):
+def check_down(row: int, column: int, tree_heights: list):
     # get visibility in the down direction
     for down_direction in reversed(range(len(tree_heights))):
-        print('comparing', tree_heights[x][down_direction], 'to', tree_heights[x][y])
-        if tree_heights[x][down_direction] >= tree_heights[x][y]:
-            if down_direction == y:
+        if tree_heights[down_direction][row] >= tree_heights[column][row]:
+            if down_direction == column:
                 print('tree is visible from down direction')
                 return True
             print('tree is not visible from down direction')
             break
+
 def main():
     input_list = []
+    # multidimensional array which represents [columns][rows]
     tree_heights = []
 
     load_input('example_input.txt', input_list)
     load_tree_heights(input_list, tree_heights)
 
-    visible_trees = 0
-    for x in range(len(tree_heights[0])):
-        for y in range(len(tree_heights)):
-            if get_visibility(x, y, tree_heights):
-                print(x, y, 'is visible')
-                visible_trees += 1
+#    visible_trees = 0
+#    for x in range(len(tree_heights[0])):
+#        for y in range(len(tree_heights)):
+#            if get_visibility(x, y, tree_heights):
+#                print(x, y, 'is visible')
+#                visible_trees += 1
     
-    print('visible trees', visible_trees)
+#    print('visible trees', visible_trees)
     for line in tree_heights:
         print(line)
+    check_down(3, 2, tree_heights)
 
 main()
