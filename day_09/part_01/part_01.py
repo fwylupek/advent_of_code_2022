@@ -15,6 +15,72 @@
 
 # add each row, column position of the tail on a grid to a list
 
-# size of grid:
-#   rows = sum of downs - sum of ups
-#   columns = sum of rights - sum of lefts
+def load_input(input_filename: str, input_list: list):
+    with open(input_filename, 'r') as open_file:
+        for line in open_file.readlines():
+            input_list.append(line.strip())
+
+def get_head_positions(input_list: list):
+    position_x = 0
+    position_y = 0
+    head_positions = [[0, 0]]
+
+    for motion_number in range(len(input_list)):
+        if input_list[motion_number].split(' ')[0] == 'U':
+            position_y += int(input_list[motion_number].split(' ')[1])
+        elif input_list[motion_number].split(' ')[0] == 'D':
+            position_y -= int(input_list[motion_number].split(' ')[1])
+        elif input_list[motion_number].split(' ')[0] == 'L':
+            position_x -= int(input_list[motion_number].split(' ')[1])
+        elif input_list[motion_number].split(' ')[0] == 'R':
+            position_x += int(input_list[motion_number].split(' ')[1])
+        head_positions.append([position_x, position_y])
+    
+    print('head positions:')
+    for position in head_positions:
+        print(position)
+    
+    print()
+    
+    return head_positions
+
+def get_grid_size(head_positions: list):
+    width = 0
+    height = 0
+
+    for position in head_positions:
+        if position[0] > width:
+            width = position[0]
+        if position[1] > height:
+            height = position[1]
+    
+    # include [0, 0] position
+    width += 1
+    height += 1
+    
+    print('grid size:', width, 'x', height)
+    return [width, height]
+
+def visualize_grid(positions: list, grid_size: list):
+    # make empty grid
+    grid = []
+
+    for height in range(grid_size[1]):
+        grid.append(['.'] * grid_size[0])
+    
+    # replace coordinate in grid with move number
+    for position in range(len(positions)):
+        grid[positions[position][1]][positions[position][0]] = position + 1
+    
+    # print grid in reverse, so y=0 is on the bottom
+    for line in reversed(range(len(grid))):
+        print(*grid[line])
+
+def main():
+    input_list = []
+    head_positions = []
+    load_input('example_input.txt', input_list)
+    head_positions = get_head_positions(input_list)
+    visualize_grid(head_positions, get_grid_size(head_positions))
+
+main()
