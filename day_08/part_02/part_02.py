@@ -34,31 +34,31 @@ def get_visibility(x: int, y: int, tree_heights: list):
 # to change check* functions, start at row, column of tree, check trees in the
 # order away from tree until one tree is >= tree in question
 
-# get visibility in the up direction
-def check_up(row: int, column: int, tree_heights: list):
-    # iterate through columns, overall length of multidimensional array
-    for up_direction in range(len(tree_heights)):
+# get visibility in the up direction, go in reverse from the position of the
+# tree - 1
+def check_up_visibility(row: int, column: int, tree_heights: list):
+    view_distance = 1
+    # iterate through columns, descending from current tree
+    for up_direction in reversed(range(column)):
         # blocking tree was found
         if tree_heights[up_direction][row] >= tree_heights[column][row]:
-            # if the tree was itself, then all trees from this direction
-            # have been checked
-            if up_direction == column:
-                return True
-
-            break
+            # return the viewing distance
+            return view_distance
+        if up_direction == 0:
+            # return the maximum viewing distance
+            return view_distance
+        view_distance += 1
 
 # get visibility in the down direction
-def check_down(row: int, column: int, tree_heights: list):
+def check_down_visibility(row: int, column: int, tree_heights: list):
     # same as check_up(), just in reverse order
     for down_direction in reversed(range(len(tree_heights))):
         if tree_heights[down_direction][row] >= tree_heights[column][row]:
             if down_direction == column:
                 return True
 
-            break
-
 # get visibility in the left direction
-def check_left(row: int, column: int, tree_heights: list):
+def check_left_visibility(row: int, column: int, tree_heights: list):
     # iterate through rows, length of an index in overall array
     for left_direction in range(len(tree_heights[0])):
         # blocking tree was found
@@ -68,17 +68,13 @@ def check_left(row: int, column: int, tree_heights: list):
             if left_direction == row:
                 return True
 
-            break
-
 # get visibility in the right direction
-def check_right(row: int, column: int, tree_heights: list):
+def check_right_visibility(row: int, column: int, tree_heights: list):
     # same as check_left(), just in reverse order
     for right_direction in reversed(range(len(tree_heights[0]))):
         if tree_heights[column][right_direction] >= tree_heights[column][row]:
             if right_direction == row:
                 return True
-
-            break
 
 def get_scenic_score(row: int, column: int, tree_heights: list):
     # look in every direction for how many trees are seen before the view
@@ -93,11 +89,12 @@ def main():
     input_list = []
     scenic_scores = []
 
-    load_input('input.txt', input_list)
+    load_input('example_input.txt', input_list)
     load_tree_heights(input_list, tree_heights)
 
     scenic_scores.sort()
 
-    print('highest scenic score:', scenic_scores[-1])
+    #print('highest scenic score:', scenic_scores[-1])
+    print(check_up_visibility(1, 2, tree_heights))
 
 main()
