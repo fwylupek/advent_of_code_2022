@@ -12,6 +12,8 @@
 # after each step, update the position of the tail if the head is no longer
 # adjacent to the tail
 # how many positions does the tail of the rope visit at least once?
+from time import sleep
+from os import system
 
 # add each row, column position of the tail on a grid to a list
 
@@ -52,9 +54,12 @@ def get_tail_positions(head_positions: list):
 
     # if "touching" or in the same position of the head, don't move
     # I think that means if x and y or no more than 1 position away
+    # if tail is on other side of where head is moving toward, then
+    # tail has to catch up even if it's just one space
 
     # if moving only horizontally or vertically, from the same direction,
-    # just take the same number of steps, - 1
+    # just take the same number of steps, - 1 if head and tail occupied same
+    # position, -2 if tail is on the other side of movement direction
 
     # if moving vertically from horizontally, or horizontally from vertically,
     # cut off the "corner"
@@ -88,10 +93,12 @@ def visualize_grid(positions: list, grid_size: list):
     # replace coordinate in grid with move number
     for position in range(len(positions)):
         grid[positions[position][1]][positions[position][0]] = position + 1
-    
-    # print grid in reverse, so y=0 is on the bottom
-    for line in reversed(range(len(grid))):
-        print(*grid[line])
+        # print grid in reverse, so y=0 is on the bottom
+        if system('clear') != 0:
+            system('cls')
+        for line in reversed(range(len(grid))):
+            print(*grid[line])
+        sleep(0.7)
 
 def main():
     input_list = []
